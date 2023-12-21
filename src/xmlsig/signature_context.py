@@ -12,6 +12,8 @@ from lxml import etree
 
 from . import constants
 from .utils import b64_print, create_node, get_rdns_name
+import re
+
 
 
 class SignatureContext(object):
