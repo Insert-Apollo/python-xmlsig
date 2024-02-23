@@ -158,8 +158,9 @@ class SignatureContext(object):
             "ds:Reference", namespaces=constants.NS_MAP
         ):
             uri = reference.get('URI')
-            external_file_xml_str = self.select_file_to_reference(external_files, uri)
-            self.calculate_reference(reference, True, external_file=external_file_xml_str)
+            if external_files is not None:
+                external_file_xml_str = self.select_file_to_reference(external_files, uri)
+                self.calculate_reference(reference, True, external_file=external_file_xml_str)
 
     def verify(self, node, external_files=None):
         """
@@ -182,7 +183,10 @@ class SignatureContext(object):
             "ds:Reference", namespaces=constants.NS_MAP
         ):
             uri = reference.get('URI')
-            external_file_xml = self.select_file_to_reference(external_files, uri)
+            if external_files is not None:
+                external_file_xml = self.select_file_to_reference(external_files, uri)
+            else:
+                external_file_xml = None
             if not self.calculate_reference(reference, False, external_file=external_file_xml):
                 raise Exception(
                     'Reference with URI:"' + reference.get("URI", "") + '" failed'
