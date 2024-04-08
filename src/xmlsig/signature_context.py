@@ -312,11 +312,11 @@ class SignatureContext(object):
         :type external_file: str
         :return: None
         """
-        if external_file is None:
-            node = self.get_uri(reference.get("URI", ""), reference)
-        else:
-            node = ""  # hope this doesn't spoil anything
+        print("reference.get(URI)", reference.get("URI", ""))
+
+        node = self.get_uri(reference.get("URI", ""), reference)
         transforms = reference.find("ds:Transforms", namespaces=constants.NS_MAP)
+        print("node", node)
         if transforms is not None:
             for transform in transforms.findall(
                     "ds:Transform", namespaces=constants.NS_MAP
