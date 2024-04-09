@@ -161,6 +161,8 @@ class SignatureContext(object):
             if external_files is not None:
                 external_file_xml_str = self.select_file_to_reference(external_files, uri)
                 self.calculate_reference(reference, True, external_file=external_file_xml_str)
+            else:
+                self.calculate_reference(reference, True)
 
     def verify(self, node, external_files=None):
         """
@@ -313,8 +315,12 @@ class SignatureContext(object):
         :return: None
         """
         print("reference.get(URI)", reference.get("URI", ""))
+        if external_file is None:
+            node = self.get_uri(reference.get("URI", ""), reference)
+        else:
+            node = ""  # hope this doesn't spoil anything
 
-        node = self.get_uri(reference.get("URI", ""), reference)
+        # node = self.get_uri(reference.get("URI", ""), reference)
         transforms = reference.find("ds:Transforms", namespaces=constants.NS_MAP)
         print("node", node)
         if transforms is not None:
