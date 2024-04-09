@@ -274,7 +274,6 @@ class SignatureContext(object):
         :type reference: etree.lxml.Element
         :return: Element of the URI in a String
         """
-        print("wszedlem w nowa biblioteke trolo - test brancha")
         if uri == "":
             return self.canonicalization(
                 constants.TransformInclC14N, reference.getroottree()
@@ -314,15 +313,11 @@ class SignatureContext(object):
         :type external_file: str
         :return: None
         """
-        print("reference.get(URI)", reference.get("URI", ""))
         if external_file is None:
             node = self.get_uri(reference.get("URI", ""), reference)
         else:
             node = ""  # hope this doesn't spoil anything
-
-        # node = self.get_uri(reference.get("URI", ""), reference)
         transforms = reference.find("ds:Transforms", namespaces=constants.NS_MAP)
-        print("node", node)
         if transforms is not None:
             for transform in transforms.findall(
                     "ds:Transform", namespaces=constants.NS_MAP
