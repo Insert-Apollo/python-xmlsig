@@ -1,5 +1,5 @@
 # © 2017 Creu Blanca
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 import struct
 import sys
@@ -101,6 +101,7 @@ def get_rdns_name(rdns):
     data = []
     XMLSIG_NAMEOID_TO_NAME = _NAMEOID_TO_NAME.copy()
     XMLSIG_NAMEOID_TO_NAME[oid.NameOID.SERIAL_NUMBER] = "SERIALNUMBER"
+    XMLSIG_NAMEOID_TO_NAME[oid.NameOID.EMAIL_ADDRESS] = "E"
     for dn in rdns:
         dn_data = []
         for attribute in dn._attributes:
