@@ -197,7 +197,7 @@ class SignatureContext(object):
             else:
                 external_file_xml = None
             if not self.calculate_reference(
-                    reference, False, external_file=external_file_xml
+                reference, False, external_file=external_file_xml
             ):
                 raise Exception(
                     'Reference with URI:"' + reference.get("URI", "") + '" failed'
