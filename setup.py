@@ -1,16 +1,9 @@
-import pathlib
-
-from pkg_resources import parse_requirements
 from setuptools import find_packages, setup
 
-with pathlib.Path("requirements.txt").open() as requirements_txt:
-    install_requires = [
-        str(requirement) for requirement in parse_requirements(requirements_txt)
-    ]
-with pathlib.Path("test-requirements.txt").open() as requirements_txt:
-    test_requires = [
-        str(requirement) for requirement in parse_requirements(requirements_txt)
-    ]
+install_requires = [
+    "lxml>=3.0.0",
+    "cryptography",
+]
 
 tests_require = [
     "freezegun==0.3.8",
@@ -30,7 +23,7 @@ tests_require = [
 
 setup(
     name="xmlsig",
-    version="0.1.7",
+    version="1.0.1",
     description="Python based XML signature",
     long_description="XML Signature created with cryptography and lxml",
     author="Enric Tobella Alomar",
@@ -43,7 +36,7 @@ setup(
     package_dir={"": "src"},
     packages=find_packages("src"),
     include_package_data=True,
-    license="AGPL-3",
+    license="LGPL-3",
     classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: GNU Affero General Public License v3",

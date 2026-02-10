@@ -10,18 +10,35 @@ on:
 
 jobs:
     test:
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                PYTHON_VERSION: ["3.6", "3.7", "3.8", "3.9"]
-                LXML_VERSION: ["4.3.0", "4.6.4"]
-                exclude:
-                    - PYTHON_VERSION: "3.9"
+                include:
+                    - PYTHON_VERSION: "3.6"
                       LXML_VERSION: "4.3.0"
+                      os: ubuntu-20.04
+                    - PYTHON_VERSION: "3.6"
+                      LXML_VERSION: "4.6.4"
+                      os: ubuntu-20.04
+                    - PYTHON_VERSION: "3.7"
+                      LXML_VERSION: "4.3.0"
+                      os: ubuntu-latest
+                    - PYTHON_VERSION: "3.7"
+                      LXML_VERSION: "4.6.4"
+                      os: ubuntu-latest
+                    - PYTHON_VERSION: "3.8"
+                      LXML_VERSION: "4.3.0"
+                      os: ubuntu-latest
+                    - PYTHON_VERSION: "3.8"
+                      LXML_VERSION: "4.6.4"
+                      os: ubuntu-latest
+                    - PYTHON_VERSION: "3.9"
+                      LXML_VERSION: "4.6.4"
+                      os: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
             - name: Set up Python
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: ${{matrix.PYTHON_VERSION}}
             - name: Configuration
@@ -36,8 +53,7 @@ jobs:
             - name: Generate Report
               run: |
                   pip install coverage
-                  pip install -r test-requirements.txt
-                  pip install .
+                  pip install .[test]
                   coverage run -m unittest
             - name: Upload Coverage to Codecov
-              uses: codecov/codecov-action@v1
+              uses: codecov/codecov-action@v3

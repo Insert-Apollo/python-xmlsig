@@ -1,17 +1,21 @@
 # © 2017 Creu Blanca
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 import base64
 import hashlib
 from os import path
 
-import OpenSSL
 from cryptography.hazmat.primitives import serialization
 from cryptography.x509.oid import ExtensionOID
 from lxml import etree
 
 from . import constants
 from .utils import b64_print, create_node, get_rdns_name
+
+try:
+    import OpenSSL
+except ImportError:
+    OpenSSL = None
 
 
 class SignatureContext(object):
@@ -196,6 +200,14 @@ class SignatureContext(object):
                     transform.getparent().getparent().getparent().getparent()
                 )
             )
+            previous = signature.getprevious()
+            if previous is not None and signature.tail:
+                previous.tail = "".join([previous.tail or "", signature.tail or ""])
+            elif signature.tail:
+                signature.getparent().text = "".join(
+                    [signature.getparent().text or "", signature.tail or ""]
+                )
+            # When removing the signature node, we need to keep the tail
             root.remove(signature)
             return self.canonicalization(constants.TransformInclC14N, root.getroottree())
         if method == constants.TransformBase64:
@@ -318,7 +330,10 @@ class SignatureContext(object):
         :type sign: bool
         :return: None
         """
-        signed_info_xml = node.find("ds:SignedInfo", namespaces=constants.NS_MAP)
+        signed_info_xml = etree.fromstring(
+            etree.tostring(node.find("ds:SignedInfo", namespaces=constants.NS_MAP))
+        )
+        # We need to extract it again in order to avoid namespace override.
         canonicalization_method = signed_info_xml.find(
             "ds:CanonicalizationMethod", namespaces=constants.NS_MAP
         ).get("Algorithm")
@@ -356,7 +371,7 @@ class SignatureContext(object):
         :type key: Union[OpenSSL.crypto.PKCS12, tuple]
         :return: None
         """
-        if isinstance(key, OpenSSL.crypto.PKCS12):
+        if OpenSSL is not None and isinstance(key, OpenSSL.crypto.PKCS12):
             # This would happen if we are using pyOpenSSL
             self.x509 = key.get_certificate().to_cryptography()
             self.public_key = key.get_certificate().to_cryptography().public_key()
