@@ -3,6 +3,7 @@
 
 import base64
 import hashlib
+import re
 from os import path
 
 from cryptography.hazmat.primitives import serialization
@@ -11,8 +12,6 @@ from lxml import etree
 
 from . import constants
 from .utils import b64_print, create_node, get_rdns_name
-import re
-
 
 try:
     import OpenSSL
@@ -161,10 +160,14 @@ class SignatureContext(object):
         for reference in signed_info.findall(
             "ds:Reference", namespaces=constants.NS_MAP
         ):
-            uri = reference.get('URI')
+            uri = reference.get("URI")
             if external_files is not None:
-                external_file_xml_str = self.select_file_to_reference(external_files, uri)
-                self.calculate_reference(reference, True, external_file=external_file_xml_str)
+                external_file_xml_str = self.select_file_to_reference(
+                    external_files, uri
+                )
+                self.calculate_reference(
+                    reference, True, external_file=external_file_xml_str
+                )
             else:
                 self.calculate_reference(reference, True)
 
@@ -188,12 +191,14 @@ class SignatureContext(object):
         for reference in signed_info.findall(
             "ds:Reference", namespaces=constants.NS_MAP
         ):
-            uri = reference.get('URI')
+            uri = reference.get("URI")
             if external_files is not None:
                 external_file_xml = self.select_file_to_reference(external_files, uri)
             else:
                 external_file_xml = None
-            if not self.calculate_reference(reference, False, external_file=external_file_xml):
+            if not self.calculate_reference(
+                    reference, False, external_file=external_file_xml
+            ):
                 raise Exception(
                     'Reference with URI:"' + reference.get("URI", "") + '" failed'
                 )
@@ -233,7 +238,9 @@ class SignatureContext(object):
                 )
             # When removing the signature node, we need to keep the tail
             root.remove(signature)
-            return self.canonicalization(constants.TransformInclC14N, root.getroottree())
+            return self.canonicalization(
+                constants.TransformInclC14N, root.getroottree()
+            )
         if method == constants.TransformBase64:
             try:
                 root = etree.fromstring(node)
@@ -332,7 +339,7 @@ class SignatureContext(object):
         transforms = reference.find("ds:Transforms", namespaces=constants.NS_MAP)
         if transforms is not None:
             for transform in transforms.findall(
-                    "ds:Transform", namespaces=constants.NS_MAP
+                "ds:Transform", namespaces=constants.NS_MAP
             ):
                 node = self.transform(transform, node)
 
@@ -347,8 +354,8 @@ class SignatureContext(object):
             )
         if not sign:
             return (
-                    digest_value.decode()
-                    == reference.find("ds:DigestValue", namespaces=constants.NS_MAP).text
+                digest_value.decode()
+                == reference.find("ds:DigestValue", namespaces=constants.NS_MAP).text
             )
 
         reference.find(
@@ -357,10 +364,10 @@ class SignatureContext(object):
 
     def calculate_external_file_digest(self, file_xml: str):
         # remove NULL and special characters
-        xml_str_clean = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F]', '', file_xml)
+        xml_str_clean = re.sub(r"[\x00-\x08\x0B\x0C\x0E-\x1F]", "", file_xml)
 
         # Reload clean string into 'bytes'
-        xml_data_clean = xml_str_clean.encode('utf-8')
+        xml_data_clean = xml_str_clean.encode("utf-8")
 
         # Calculate file digest
         digest_value = hashlib.sha256(xml_data_clean).digest()
